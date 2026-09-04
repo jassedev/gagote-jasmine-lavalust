@@ -8,11 +8,11 @@ class UsersController extends Controller
         // Load the UsersModel
         $this->call->model('UsersModel');
 
-        // Retrieve all records from the users table
+        // Retrieve all users
         $users = $this->UsersModel->all();
 
-        // Pass the users data to the User view
-        $this->call->view('User.php', [
+        // Pass users to the view
+        $this->call->view('users', [
             'users' => $users
         ]);
     }

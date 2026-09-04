@@ -1,19 +1,15 @@
 <?php
 defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 
-class UsersController extends Controller
+class StudentController extends Controller
 {
     public function index()
     {
-        // Load the UsersModel
-        $this->call->model('UsersModel');
+        $this->call->view('student_home');
+    }
 
-        // Retrieve all records from the users table
-        $users = $this->UsersModel->all();
-
-        // Pass the retrieved users to the view
-        $this->call->view('User.php', [
-            'users' => $users
-        ]);
+    public function profile()
+    {
+        $this->call->view('student_profile');
     }
 }

@@ -47,8 +47,8 @@ if (file_exists(ROOT_DIR . '.env')) {
     foreach (file(ROOT_DIR . '.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
         $line = trim($line);
 
-        // Skip comments and lines without =
-        if ($line[0] === '#' || !str_contains($line, '=')) continue;
+		// Skip blank lines, comments, and lines without an assignment.
+		if ($line === '' || $line[0] === '#' || !str_contains($line, '=')) continue;
 
         [$key, $value] = explode('=', $line, 2);
         $key   = trim($key);
