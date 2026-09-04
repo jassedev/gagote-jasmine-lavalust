@@ -10,6 +10,13 @@ class StudentController extends Controller
 
     public function profile()
     {
-        $this->call->view('student_profile');
+        $this->call->view('student_profile', [
+            'student_id' => '2024-0001',
+            'name'       => 'Juan Dela Cruz',
+            'course'     => 'Bachelor of Science in Information Technology',
+            'year'       => '3rd Year',
+            'section'    => 'A',
+            'email'      => 'juan.delacruz@example.com',
+        ]);
     }
 }

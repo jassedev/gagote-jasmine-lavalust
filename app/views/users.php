@@ -125,11 +125,11 @@
                     <?php foreach ($users as $user): ?>
 
                         <tr>
-                            <td><?= $user['id']; ?></td>
-                            <td><?= $user['firstname']; ?></td>
-                            <td><?= $user['lastname']; ?></td>
-                            <td><?= $user['email']; ?></td>
-                            <td><?= $user['username']; ?></td>
+                            <td><?= htmlspecialchars((string) $user['id'], ENT_QUOTES, 'UTF-8'); ?></td>
+                            <td><?= htmlspecialchars((string) $user['firstname'], ENT_QUOTES, 'UTF-8'); ?></td>
+                            <td><?= htmlspecialchars((string) $user['lastname'], ENT_QUOTES, 'UTF-8'); ?></td>
+                            <td><?= htmlspecialchars((string) $user['email'], ENT_QUOTES, 'UTF-8'); ?></td>
+                            <td><?= htmlspecialchars((string) $user['username'], ENT_QUOTES, 'UTF-8'); ?></td>
                         </tr>
 
                     <?php endforeach; ?>

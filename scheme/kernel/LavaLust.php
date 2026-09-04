@@ -43,8 +43,11 @@ require_once SYSTEM_DIR . 'kernel/Routine.php';
 /**
  * Check and load .env file if any
  */
-if (file_exists(ROOT_DIR . '.env')) {
-    foreach (file(ROOT_DIR . '.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
+if (is_file(ROOT_DIR . '.env') && is_readable(ROOT_DIR . '.env')) {
+	$env_lines = file(ROOT_DIR . '.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
+	if ($env_lines !== false) {
+		foreach ($env_lines as $line) {
         $line = trim($line);
 
 		// Skip blank lines, comments, and lines without an assignment.
@@ -64,6 +67,7 @@ if (file_exists(ROOT_DIR . '.env')) {
 
         putenv("$key=$value");
         $_ENV[$key] = $_SERVER[$key] = $value;
+		}
     }
 }
 
