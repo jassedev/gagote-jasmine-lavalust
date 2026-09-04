@@ -4,153 +4,260 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>User Management</title>
+    <title>Users | User Management</title>
 
     <style>
+
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
+
 
         body {
-            font-family: Arial, sans-serif;
-            background: #f8f9fc;
-            padding: 40px 20px;
+            font-family: Arial, Helvetica, sans-serif;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #f4f7f3 0%,
+                    #e7efeb 50%,
+                    #edf1ec 100%
+                );
+
+            min-height: 100vh;
+
+            color: #263238;
         }
+
+
+        /* MAIN CONTAINER */
 
         .container {
-            max-width: 1000px;
-            margin: auto;
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            width: 72%;
+            max-width: 1150px;
+
+            margin: 0 auto;
+
+            padding-top: 70px;
         }
 
-        h1 {
-            text-align: center;
-            margin-bottom: 10px;
-            color: #333;
+
+        /* PAGE HEADER */
+
+        .module-title {
+            color: #2f6654;
+
+            font-size: 12px;
+            font-weight: bold;
+
+            letter-spacing: 3px;
+
+            text-transform: uppercase;
+
+            margin-bottom: 12px;
         }
 
-        .subtitle {
-            text-align: center;
-            color: #777;
-            margin-bottom: 30px;
+
+        .page-title {
+            font-family: Georgia, "Times New Roman", serif;
+
+            font-size: 60px;
+            font-weight: 400;
+
+            color: #263238;
+
+            margin-bottom: 28px;
         }
+
+
+        /* GOLD ACCENT */
+
+        .accent-line {
+            width: 65px;
+            height: 3px;
+
+            background-color: #b8860b;
+
+            margin-bottom: 18px;
+        }
+
+
+        /* TABLE CONTAINER */
 
         .table-container {
-            overflow-x: auto;
+            width: 100%;
+
+            background-color:
+                rgba(255, 255, 255, 0.35);
+
+            border: 1px solid #c5d0cb;
         }
+
 
         table {
             width: 100%;
+
             border-collapse: collapse;
         }
 
+
+        /* TABLE HEADER */
+
         thead {
-            background: #d63384;
-            color: white;
+            background-color:
+                rgba(234, 240, 236, 0.75);
         }
 
-        th,
-        td {
-            padding: 14px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-        }
 
         th {
-            font-size: 14px;
+            padding: 14px 16px;
+
+            text-align: left;
+
+            color: #456052;
+
+            font-size: 11px;
+
+            font-weight: bold;
+
+            letter-spacing: 1.8px;
+
             text-transform: uppercase;
+
+            border-bottom:
+                1px solid #bfcac5;
         }
+
+
+        /* TABLE BODY */
+
+        td {
+            padding: 14px 16px;
+
+            font-size: 15px;
+
+            color: #34423d;
+
+            border-bottom:
+                1px solid #cbd4d0;
+        }
+
+
+        tbody tr {
+            transition:
+                background-color 0.2s ease;
+        }
+
 
         tbody tr:hover {
-            background: #fff5fa;
+            background-color: #f4f1df;
         }
 
-        .no-data {
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+
+        /* ID COLUMN */
+
+        .id {
+            color: #2f6654;
+            font-weight: 500;
+        }
+
+
+        /* USERNAME */
+
+        .username {
+            color: #6d5610;
+            font-weight: 500;
+        }
+
+
+        /* EMPTY DATA */
+
+        .empty {
             text-align: center;
-            padding: 20px;
+
+            padding: 30px;
+
             color: #777;
         }
 
-        @media (max-width: 600px) {
-            body {
-                padding: 20px 10px;
-            }
+
+        /* RESPONSIVE DESIGN */
+
+        @media screen and (max-width: 900px) {
 
             .container {
-                padding: 20px;
+                width: 90%;
+                padding-top: 40px;
             }
 
-            th,
-            td {
-                padding: 10px;
-                font-size: 13px;
+
+            .page-title {
+                font-size: 48px;
             }
+
         }
+
+
+        @media screen and (max-width: 600px) {
+
+            .container {
+                width: 94%;
+                padding-top: 30px;
+            }
+
+
+            .page-title {
+                font-size: 40px;
+            }
+
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+
+            table {
+                min-width: 700px;
+            }
+
+        }
+
     </style>
+
 </head>
+
 
 <body>
 
-<div class="container">
 
-    <h1>User Management</h1>
+    <div class="container">
 
-    <p class="subtitle">
-        List of Registered Users
-    </p>
 
-    <div class="table-container">
+        <!-- MODULE LABEL -->
 
-        <table>
+        <div class="module-title">
 
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Email</th>
-                    <th>Username</th>
-                </tr>
-            </thead>
+            User Management Module
 
-            <tbody>
+        </div>
 
-                <?php if (!empty($users)): ?>
 
-                    <?php foreach ($users as $user): ?>
+        <!-- MAIN TITLE -->
 
-                        <tr>
-                            <td><?= htmlspecialchars((string) $user['id'], ENT_QUOTES, 'UTF-8'); ?></td>
-                            <td><?= htmlspecialchars((string) $user['firstname'], ENT_QUOTES, 'UTF-8'); ?></td>
-                            <td><?= htmlspecialchars((string) $user['lastname'], ENT_QUOTES, 'UTF-8'); ?></td>
-                            <td><?= htmlspecialchars((string) $user['email'], ENT_QUOTES, 'UTF-8'); ?></td>
-                            <td><?= htmlspecialchars((string) $user['username'], ENT_QUOTES, 'UTF-8'); ?></td>
-                        </tr>
+        <h1 class="page-title">
 
-                    <?php endforeach; ?>
+       Users
 
-                <?php else: ?>
+        </h1>
 
-                    <tr>
-                        <td colspan="5" class="no-data">
-                            No users found.
-                        </td>
-                    </tr>
 
-                <?php endif; ?>
+        <!-- DARK YELLOW / GOLD ACCENT -->
 
-            </tbody>
-
-        </table>
-
-    </div>
-
-</div>
-
-</body>
-</html>
+        <div class="accent-line"></div>
