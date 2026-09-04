@@ -1,19 +1,18 @@
 <?php
-defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
+
+namespace App\Controllers;
+
+use App\Models\UsersModel;
+use System\Controller;
 
 class UsersController extends Controller
 {
     public function index()
     {
-        // Load the UsersModel
-        $this->call->model('UsersModel');
+        $usersModel = new UsersModel();
 
-        // Retrieve all users
-        $users = $this->UsersModel->all();
+        $data['users'] = $usersModel->all();
 
-        // Pass users to the view
-        $this->call->view('users', [
-            'users' => $users
-        ]);
+        $this->call->view('users', $data);
     }
 }

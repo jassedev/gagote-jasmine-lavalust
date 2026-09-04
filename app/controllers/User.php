@@ -2,68 +2,141 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Users | User Management</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>User Management</title>
 
     <style>
+
+        /* =========================
+           GENERAL DESIGN
+        ========================== */
+
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            font-family: Arial, Helvetica, sans-serif;
-            background: #f4f5ee;
-            color: #203b2d;
+            font-family: Arial, sans-serif;
             min-height: 100vh;
+            background:
+                linear-gradient(
+                    135deg,
+                    #12372A,
+                    #1F5A44,
+                    #2E7D5B
+                );
+            padding: 40px 20px;
         }
 
-        .page-container {
-            width: 75%;
+
+        /* =========================
+           MAIN CONTAINER
+        ========================== */
+
+        .container {
             max-width: 1150px;
-            margin: 0 auto;
-            padding: 70px 0;
+            margin: auto;
         }
 
-        /* TOP LABEL */
-        .label {
-            color: #a66f00;
-            font-size: 12px;
-            font-weight: bold;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            margin-bottom: 12px;
+
+        /* =========================
+           HEADER
+        ========================== */
+
+        .header {
+            background: rgba(255, 255, 255, 0.96);
+            border-left: 7px solid #B8860B;
+            padding: 28px 35px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+
+            box-shadow:
+                0 10px 30px
+                rgba(0, 0, 0, 0.25);
         }
 
-        /* MAIN TITLE */
-        h1 {
-            font-family: Georgia, "Times New Roman", serif;
-            font-size: 58px;
-            font-weight: normal;
-            color: #1f4d36;
-            margin-bottom: 28px;
-            position: relative;
+        .header h1 {
+            color: #12372A;
+            font-size: 30px;
+            margin-bottom: 8px;
         }
 
-        /* GOLD ACCENT LINE */
-        h1::after {
-            content: "";
-            display: block;
-            width: 70px;
+        .header p {
+            color: #666;
+            font-size: 15px;
+        }
+
+        .gold-line {
+            width: 80px;
             height: 4px;
-            background: #a66f00;
-            margin-top: 12px;
+            background: #B8860B;
+            margin-top: 15px;
+            border-radius: 10px;
         }
 
-        .table-wrapper {
-            width: 100%;
-            overflow-x: auto;
+
+        /* =========================
+           TABLE CARD
+        ========================== */
+
+        .table-card {
             background: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 8px 25px rgba(31, 77, 54, 0.10);
-            border-top: 4px solid #1f4d36;
+            border-radius: 18px;
+            overflow: hidden;
+
+            box-shadow:
+                0 15px 40px
+                rgba(0, 0, 0, 0.25);
+        }
+
+
+        /* =========================
+           TABLE HEADER
+        ========================== */
+
+        .table-title {
+            background:
+                linear-gradient(
+                    90deg,
+                    #12372A,
+                    #1F5A44
+                );
+
+            padding: 20px 30px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-title h2 {
+            color: white;
+            font-size: 20px;
+        }
+
+        .badge {
+            background: #B8860B;
+            color: white;
+
+            padding: 8px 15px;
+            border-radius: 20px;
+
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+
+        /* =========================
+           TABLE
+        ========================== */
+
+        .table-responsive {
+            overflow-x: auto;
         }
 
         table {
@@ -71,149 +144,54 @@
             border-collapse: collapse;
         }
 
-        /* TABLE HEADER */
         thead {
-            background: #1f4d36;
+            background: #F5E6B3;
         }
 
         th {
-            padding: 16px 18px;
+            color: #12372A;
+            padding: 18px;
             text-align: left;
-            color: #f4c542;
-            font-size: 11px;
-            letter-spacing: 2px;
+            font-size: 14px;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        /* TABLE DATA */
         td {
-            padding: 16px 18px;
-            font-size: 15px;
-            color: #294235;
-            border-bottom: 1px solid #e4e6dd;
+            padding: 17px 18px;
+            color: #444;
+            border-bottom: 1px solid #eeeeee;
+        }
+
+        tbody tr {
+            transition: 0.3s;
+        }
+
+        tbody tr:hover {
+            background: #FFF9E6;
+            transform: scale(1.002);
         }
 
         tbody tr:last-child td {
             border-bottom: none;
         }
 
-        /* HOVER EFFECT */
-        tbody tr {
-            transition: all 0.25s ease;
-        }
 
-        tbody tr:hover {
-            background: #fff8e6;
-            transform: scale(1.005);
-        }
+        /* =========================
+           ID DESIGN
+        ========================== */
 
-        /* ID COLUMN */
-        td:first-child {
-            color: #a66f00;
+        .id-number {
+            background: #12372A;
+            color: #ffffff;
+
+            width: 35px;
+            height: 35px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 50%;
             font-weight: bold;
         }
-
-        /* USERNAME COLUMN */
-        td:last-child {
-            color: #1f4d36;
-            font-weight: bold;
-        }
-
-        .no-data {
-            text-align: center;
-            padding: 30px;
-            color: #777;
-        }
-
-        /* MOBILE DESIGN */
-        @media (max-width: 768px) {
-
-            .page-container {
-                width: 90%;
-                padding-top: 40px;
-            }
-
-            h1 {
-                font-size: 45px;
-            }
-
-            th,
-            td {
-                padding: 13px 12px;
-                white-space: nowrap;
-            }
-        }
-    </style>
-</head>
-
-<body>
-
-    <div class="page-container">
-
-        <div class="label">
-            User Management Module
-        </div>
-
-        <h1>Users</h1>
-
-        <div class="table-wrapper">
-
-            <table>
-
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Email</th>
-                        <th>Username</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-
-                    <?php if (!empty($users)): ?>
-
-                        <?php foreach ($users as $user): ?>
-
-                            <tr>
-                                <td><?= htmlspecialchars($user['id']) ?></td>
-                                <td>
-                                    <?= htmlspecialchars($user['firstname']) ?>
-                                </td>
-
-                                <td>
-                                    <?= htmlspecialchars($user['lastname']) ?>
-                                </td>
-
-                                <td>
-                                    <?= htmlspecialchars($user['email']) ?>
-                                </td>
-
-                                <td>
-                                    <?= htmlspecialchars($user['username']) ?>
-                                </td>
-                            </tr>
-
-                        <?php endforeach; ?>
-
-                    <?php else: ?>
-
-                        <tr>
-                            <td colspan="5" class="no-data">
-                                No users found.
-                            </td>
-                        </tr>
-
-                    <?php endif; ?>
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-    </div>
-
-</body>
-</html>
