@@ -1,21 +1,21 @@
-ARG PHP_VERSION=8.5
+ARG PHP_VERSION=8.4
 
 FROM php:${PHP_VERSION}-apache
 
-# Install PDO MySQL
-RUN docker-php-ext-install pdo pdo_mysql
+RUN docker-php-ext-install pdo pdo_mysql \
+    && a2enmod rewrite
 
-# Enable Apache mod_rewrite
-RUN a2enmod rewrite
+WORKDIR /var/www/html
 
-# Allow .htaccess overrides
-RUN sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
-
-# Copy app files
 COPY . /var/www/html/
 
-# Fix permissions
-RUN chown -R www-data:www-data /var/www/html \
+RUN printf '<Directory /var/www/html>\n\
+    AllowOverride All\n\
+    Require all granted\n\
+</Directory>\n' \
+    > /etc/apache2/conf-available/lavalust.conf \
+    && a2enconf lavalust \
+    && chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
 
 EXPOSE 80
