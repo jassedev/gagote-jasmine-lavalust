@@ -11,7 +11,7 @@ class UsersController extends Controller
         // Retrieve all records from the users table
         $users = $this->UsersModel->all();
 
-        // Pass the retrieved users to the view
+        // Pass the users data to the User view
         $this->call->view('User.php', [
             'users' => $users
         ]);
