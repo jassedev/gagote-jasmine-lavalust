@@ -4,6 +4,8 @@ class StudentController extends Controller
 {
     public function index()
     {
+        $this->call->database();
+
         // Load the StudentModel
         $this->call->model('StudentModel');
 
