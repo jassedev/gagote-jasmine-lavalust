@@ -43,15 +43,12 @@ require_once SYSTEM_DIR . 'kernel/Routine.php';
 /**
  * Check and load .env file if any
  */
-if (is_file(ROOT_DIR . '.env') && is_readable(ROOT_DIR . '.env')) {
-	$env_lines = file(ROOT_DIR . '.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-
-	if ($env_lines !== false) {
-		foreach ($env_lines as $line) {
+if (file_exists(ROOT_DIR . '.env')) {
+    foreach (file(ROOT_DIR . '.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
         $line = trim($line);
 
-		// Skip blank lines, comments, and lines without an assignment.
-		if ($line === '' || $line[0] === '#' || !str_contains($line, '=')) continue;
+        // Skip comments and lines without =
+        if ($line[0] === '#' || !str_contains($line, '=')) continue;
 
         [$key, $value] = explode('=', $line, 2);
         $key   = trim($key);
@@ -67,7 +64,6 @@ if (is_file(ROOT_DIR . '.env') && is_readable(ROOT_DIR . '.env')) {
 
         putenv("$key=$value");
         $_ENV[$key] = $_SERVER[$key] = $value;
-		}
     }
 }
 
@@ -239,7 +235,9 @@ if (php_sapi_name() === 'cli') {
     $method = 'GET';
     
 } else {
-    $url = $router->sanitize_url(str_replace($_SERVER['SCRIPT_NAME'], '', $_SERVER['PHP_SELF']));
+    $base  = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
+	$path  = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+	$url   = $router->sanitize_url(substr($path, strlen($base)) ?: '/');
     $method = isset($_SERVER['REQUEST_METHOD']) ? strtoupper($_SERVER['REQUEST_METHOD']) : 'GET';
 }
 
