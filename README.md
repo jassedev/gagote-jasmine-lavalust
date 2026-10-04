@@ -215,6 +215,63 @@ Route definition:
 $router->get('/api/users', 'Api::users');
 ```
 
+## Vue API setup
+
+The application exposes a JSON API under `/api`; the existing server-rendered
+routes remain available. Copy `.env.example` to `.env`, configure the database
+values, and set two independent secrets (each at least 32 characters):
+
+```text
+JWT_SECRET=<random secret>
+JWT_REFRESH_SECRET=<different random secret>
+CORS_ALLOWED_ORIGINS=http://localhost:5173
+```
+
+Generate a secret with `php -r "echo bin2hex(random_bytes(32)), PHP_EOL;"`.
+Set `CORS_ALLOWED_ORIGINS` to the Vue application's exact origin(s), separated
+by commas. Do not commit `.env` or use the same value for both token secrets.
+
+Apply database migrations after backing up any existing database:
+
+```bash
+php lava migration status
+php lava migration run
+```
+
+The users table fields are `id`, `username`, `email`, `password`, `role`,
+`is_active`, and `created_at`. Passwords are stored as hashes. The migrations
+also create refresh-token, students, and products tables.
+Registration only creates regular users. To bootstrap the first administrator,
+register that account, then promote it once from a trusted database console:
+
+```sql
+UPDATE users SET role = 'admin' WHERE email = 'admin@example.com';
+```
+
+### Endpoints
+
+| Method | Endpoint | Access |
+|---|---|---|
+| POST | `/api/register` | Public; creates a regular user |
+| POST | `/api/login` | Public; returns access and refresh JWTs |
+| POST | `/api/refresh` | Public; rotates a refresh JWT |
+| POST | `/api/logout` | Access JWT and its refresh JWT; revokes the refresh token |
+| GET | `/api/profile` | Access JWT; current user |
+| GET, POST | `/api/users` | Administrator |
+| GET, PUT, PATCH, DELETE | `/api/users/{id}` | Administrator |
+| GET | `/api/products` | Access JWT |
+| POST | `/api/products` | Administrator |
+| GET, PUT, PATCH, DELETE | `/api/products/{id}` | Access JWT for GET; administrator for writes |
+| GET | `/api/students` | Access JWT |
+| POST | `/api/students` | Administrator |
+| GET, PUT, PATCH, DELETE | `/api/students/{id}` | Access JWT for GET; administrator for writes |
+
+Send `Authorization: Bearer <access_token>` and JSON request bodies with
+`Content-Type: application/json`. The login/refresh response contains
+`access_token`, `refresh_token`, `expires_in`, and `token_type`. Refresh tokens
+are rotated on refresh and stored hashed in the database. Keep access tokens
+short-lived and avoid persistent browser storage where possible.
+
 ---
 
 ## Philosophy

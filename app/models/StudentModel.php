@@ -3,15 +3,16 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 
 class StudentModel extends Model
 {
-    protected $table = 'users';
+    protected $table = 'students';
 
     protected $fillable = [
         'id',
-        'first_name',
-        'last_name',
+        'student_id',
+        'name',
         'course',
+        'year',
+        'section',
         'email',
-        'username',
     ];
 
     protected $timestamps = true;

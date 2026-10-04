@@ -59,11 +59,6 @@ class Create_users_table {
                     'null'    => FALSE,
                     'default' => 'CURRENT_TIMESTAMP',
                 ],
-                'updated_at' => [
-                    'type'    => 'DATETIME',
-                    'null'    => TRUE,
-                    'default' => NULL,
-                ],
             ])
             ->add_key('id', primary: TRUE)
             ->add_key('username', unique: TRUE, name: 'username_unique')

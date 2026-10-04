@@ -184,6 +184,9 @@ class Api
     public function handle_cors()
     {
         $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+        if ($origin !== '') {
+            header('Vary: Origin');
+        }
 
         if (is_array($this->allow_origin)) {
             $allowed = in_array($origin, $this->allow_origin, true);
@@ -191,7 +194,7 @@ class Api
             $allowed = $this->allow_origin === '*' || $this->allow_origin === $origin;
         }
 
-        if ($allowed && $origin) {
+        if ($allowed && $origin && $this->allow_origin !== '*') {
             header("Access-Control-Allow-Origin: $origin");
             header('Access-Control-Allow-Credentials: true');
         } elseif ($this->allow_origin === '*') {
@@ -442,7 +445,7 @@ class Api
         [$headerEnc, $payloadEnc, $sigEnc] = $parts;
 
         $header = json_decode($this->base64UrlDecode($headerEnc), true);
-        if (($header['alg'] ?? '') !== 'HS256') return null;
+        if (($header['alg'] ?? '') !== 'HS256' || ($header['typ'] ?? '') !== 'JWT') return null;
 
         $validSig = hash_hmac('sha256', "$headerEnc.$payloadEnc", $this->jwt_secret, true);
         if (!hash_equals($this->base64UrlEncode($validSig), $sigEnc)) return null;
@@ -461,8 +464,16 @@ class Api
         $payload = $this->decode_jwt($token);
         if (!$payload) return null;
 
-        if (!isset($payload['sub'], $payload['exp'], $payload['iat'])) return null;
-        if ($payload['exp'] < time() || ($payload['iat'] ?? 0) > time()) return null;
+        if (!is_array($payload) ||
+            !isset($payload['sub'], $payload['exp'], $payload['iat']) ||
+            !is_numeric($payload['exp']) ||
+            !is_numeric($payload['iat'])) {
+            return null;
+        }
+        if ((int) $payload['exp'] <= time() || (int) $payload['iat'] > time()) return null;
+        if (isset($payload['nbf']) && (!is_numeric($payload['nbf']) || (int) $payload['nbf'] > time())) {
+            return null;
+        }
         if (($payload['iss'] ?? '') !== $this->jwt_issuer || ($payload['aud'] ?? '') !== $this->jwt_audience) return null;
 
         return $payload;
@@ -496,7 +507,7 @@ class Api
         $token = $this->get_bearer_token();
         $payload = $this->validate_jwt($token ?? '');
 
-        if (!$payload) {
+        if (!$payload || ($payload['type'] ?? 'access') !== 'access') {
             $this->respond_error('Unauthorized', 401);
         }
 
@@ -522,12 +533,14 @@ class Api
             'sub'   => $user_id,
             'role'  => $user_data['role'] ?? 'user',
             'scopes'=> $scopes,
+            'type'  => 'access',
         ];
 
         $refresh_payload = [
             'sub'  => $user_id,
             'type' => 'refresh',
             'jti'  => bin2hex(random_bytes(16)),
+            'exp'  => $now + $this->refresh_token_expiration,
         ];
 
         $access_token  = $this->encode_jwt($access_payload);
@@ -569,26 +582,30 @@ class Api
 
         $hashed = hash_hmac('sha256', $refresh_token, $this->refresh_token_key);
 
-        $stmt = $this->_lava->db->raw(
-            "SELECT * FROM {$this->refresh_token_table} 
-             WHERE token = ? AND expires_at > NOW() LIMIT 1",
+        $revoked = $this->_lava->db->raw(
+            "DELETE FROM {$this->refresh_token_table} WHERE token = ? AND expires_at > NOW()",
             [$hashed]
-        );
-        $found = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if (!$found) {
+        )->rowCount();
+        if ($revoked !== 1) {
             $this->respond_error('Refresh token expired or revoked', 403);
         }
 
-        // Revoke old + rotate (best practice)
-        $this->revoke_refresh_token($refresh_token);
+        $user = $this->_lava->db->raw(
+            'SELECT id, role, is_active FROM users WHERE id = ? LIMIT 1',
+            [$payload['sub']]
+        )->fetch(PDO::FETCH_ASSOC);
 
-        $new_tokens = $this->issue_tokens(['id' => $payload['sub']]);
+        if (!$user || (int) $user['is_active'] !== 1) {
+            $this->revoke_refresh_token($refresh_token);
+            $this->respond_error('Account is unavailable', 401);
+        }
 
-        $this->respond([
-            'message' => 'Tokens refreshed successfully',
-            'tokens'  => $new_tokens
+        $new_tokens = $this->issue_tokens([
+            'id' => (int) $user['id'],
+            'role' => $user['role'],
         ]);
+
+        $this->respond($new_tokens);
     }
 
     /**
